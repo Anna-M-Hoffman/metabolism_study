@@ -44,7 +44,7 @@ async function loadDiagram(tabId) {
   studyMode = false;
   const toggleButton = toggleButtons[tabId];
   toggleButton.textContent = "Study Mode Off";
-  toggleButton.style.backgroundColor = "#f7a0a0";
+  toggleButton.style.backgroundColor = "#ff7777ff";
 
   try {
     const response = await fetch(diagrams[tabId]);
@@ -111,7 +111,7 @@ function checkAllRevealed(container, toggleButton) {
   if (allRevealed) {
     studyMode = false;
     toggleButton.textContent = "Study Mode Off";
-    toggleButton.style.backgroundColor = "#f7a0a0";
+    toggleButton.style.backgroundColor = "#ff7777ff";
     nodes.forEach(node => {
       node.classList.remove("study-blur", "study-hide");
       const overlay = node.querySelector(".overlay-rect");
@@ -132,7 +132,7 @@ for (const [tabId, button] of Object.entries(toggleButtons)) {
     if (studyMode) {
       applyStudyMode(container, currentMode, button);
       button.textContent = "Study Mode On";
-      button.style.backgroundColor = "#a0e7a0";
+      button.style.backgroundColor = "#98ff98ff";
     } else {
       const nodes = container.querySelectorAll("g.node");
       nodes.forEach(node => {
@@ -141,7 +141,7 @@ for (const [tabId, button] of Object.entries(toggleButtons)) {
         if (overlay) overlay.remove();
       });
       button.textContent = "Study Mode Off";
-      button.style.backgroundColor = "#f7a0a0";
+      button.style.backgroundColor = "#ff7777ff";
     }
   });
 }

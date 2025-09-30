@@ -38,15 +38,29 @@ nav a:hover {
 
 /* Background gradients per tab */
 #home { background: linear-gradient(135deg, #6a11cb, #2575fc); }
-#about { background: linear-gradient(135deg, #ff9a9e, #fad0c4); }
-#krebbs { background: linear-gradient(135deg, #ffbd90, #ff9ee3); }
-#glycolysis { background: linear-gradient(135deg, #ff9ee3, #a6c1ee); }
-#ppp { background: linear-gradient(135deg, #84fab0, #8fd3f4); }
+#ppp { background: linear-gradient(135deg, #a6f9c4, #3fe5ff); }
+#glycolysis { background: linear-gradient(135deg, #ff9ee3, #93baff); }
+#krebbs { background: linear-gradient(135deg, #ffa95e, #ff95e1); }
+#about { background: linear-gradient(135deg, #18b43f, #cbf630); }
 
 .controls {
   margin-top: 1rem;
 }
 
+/* PPP tab text color */
+#ppp {
+  color: black;
+}
+
+/* Glycolysis tab text color */
+#glycolysis {
+  color: black;
+}
+
+/* Krebbs Cycle tab text color */
+#krebbs {
+  color: black;
+}
 
 #toggleStudy {
   font-weight: bold;
