@@ -1,5 +1,4 @@
 import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
-
 mermaid.initialize({ startOnLoad: false });
 
 const tabs = document.querySelectorAll(".tablink");
@@ -35,6 +34,28 @@ const modeSelects = {
   krebbs: document.getElementById("modeSelect-krebbs")
 };
 
+// helpers to show/hide select
+function showSelect(select) {
+  if (!select) return;
+  select.style.display = "";
+}
+function hideSelect(select) {
+  if (!select) return;
+  select.style.display = "none";
+}
+
+// clear overlays, classes and handlers
+function resetNodes(container) {
+  if (!container) return;
+  const nodes = container.querySelectorAll("g.node");
+  nodes.forEach(node => {
+    node.classList.remove("study-blur", "study-hide", "revealed");
+    const overlay = node.querySelector(".overlay-rect");
+    if (overlay) overlay.remove();
+    node.onclick = null;
+  });
+}
+
 // Load Mermaid diagram for a tab
 async function loadDiagram(tabId) {
   const container = diagramContainers[tabId];
@@ -42,9 +63,16 @@ async function loadDiagram(tabId) {
 
   container.innerHTML = ""; // Clear old diagram
   studyMode = false;
+
+  // reset toggle button/select visuals for this tab
   const toggleButton = toggleButtons[tabId];
-  toggleButton.textContent = "Study Mode Off";
-  toggleButton.style.backgroundColor = "#ff7777ff";
+  const select = modeSelects[tabId];
+  if (toggleButton) {
+    toggleButton.textContent = "Study Mode Off";
+    toggleButton.style.backgroundColor = "#ff7777ff";
+    toggleButton.disabled = false;
+  }
+  showSelect(select);
 
   try {
     const response = await fetch(diagrams[tabId]);
@@ -55,28 +83,36 @@ async function loadDiagram(tabId) {
     diagramDiv.textContent = text;
     container.appendChild(diagramDiv);
 
-    mermaid.init({ startOnLoad: false }, diagramDiv);
+    await mermaid.init({ startOnLoad: false }, diagramDiv);
+
+    // make sure nodes are clean after render
+    resetNodes(container);
   } catch (err) {
     container.textContent = "Failed to load diagram: " + err;
   }
 }
 
 // Apply study mode to all nodes in a container
-function applyStudyMode(container, mode, toggleButton) {
-  const nodes = container.querySelectorAll("g.node");
+// NOTE: we pass `select` so checkAllRevealed can restore it when needed
+function applyStudyMode(container, mode, toggleButton, select) {
+  if (!container) return;
+  // clear previous state
+  resetNodes(container);
 
+  const nodes = container.querySelectorAll("g.node");
   nodes.forEach(node => {
     node.classList.remove("study-blur", "study-hide", "revealed");
 
     if (mode === "study-blur") {
       node.classList.add("study-blur");
-      node.addEventListener("click", () => {
+      node.onclick = function (e) {
+        e.stopPropagation();
         if (node.classList.contains("study-blur")) {
           node.classList.remove("study-blur");
           node.classList.add("revealed");
-          checkAllRevealed(container, toggleButton);
+          checkAllRevealed(container, toggleButton, select);
         }
-      });
+      };
     } else if (mode === "study-hide") {
       node.classList.add("study-hide");
       const rect = node.querySelector("rect");
@@ -91,61 +127,85 @@ function applyStudyMode(container, mode, toggleButton) {
         overlay.setAttribute("class", "overlay-rect");
         overlay.style.cursor = "pointer";
 
-        overlay.addEventListener("click", () => {
+        overlay.onclick = function (e) {
+          e.stopPropagation();
           node.classList.remove("study-hide");
           node.classList.add("revealed");
           overlay.remove();
-          checkAllRevealed(container, toggleButton);
-        });
+          checkAllRevealed(container, toggleButton, select);
+        };
 
         node.appendChild(overlay);
       }
+
+      // fallback: clicking node reveals
+      node.onclick = function (e) {
+        e.stopPropagation();
+        const ov = node.querySelector(".overlay-rect");
+        if (ov) ov.remove();
+        node.classList.remove("study-hide");
+        node.classList.add("revealed");
+        checkAllRevealed(container, toggleButton, select);
+      };
     }
   });
 }
 
 // Check if all nodes revealed in a container
-function checkAllRevealed(container, toggleButton) {
+function checkAllRevealed(container, toggleButton, select) {
   const nodes = container.querySelectorAll("g.node");
-  const allRevealed = Array.from(nodes).every(n => n.classList.contains("revealed"));
+  // if no nodes, don't treat as all revealed
+  const allRevealed = nodes.length > 0 && Array.from(nodes).every(n => n.classList.contains("revealed"));
   if (allRevealed) {
     studyMode = false;
-    toggleButton.textContent = "Study Mode Off";
-    toggleButton.style.backgroundColor = "#ff7777ff";
+    if (toggleButton) {
+      toggleButton.textContent = "Study Mode Off";
+      toggleButton.style.backgroundColor = "#ff7777ff";
+      toggleButton.disabled = false;
+    }
+    // ensure select reappears when auto-off triggers
+    showSelect(select);
+
+    // cleanup classes and overlays defensively
     nodes.forEach(node => {
       node.classList.remove("study-blur", "study-hide");
       const overlay = node.querySelector(".overlay-rect");
       if (overlay) overlay.remove();
+      node.onclick = null;
     });
   }
 }
-
 
 // Initialize Study Mode buttons per tab
 for (const [tabId, button] of Object.entries(toggleButtons)) {
   const container = diagramContainers[tabId];
   const select = modeSelects[tabId];
 
+  // guard for missing DOM nodes
+  if (!button || !container || !select) continue;
+
   button.addEventListener("click", () => {
     studyMode = !studyMode;
     currentMode = select.value === "blur" ? "study-blur" : "study-hide";
 
     if (studyMode) {
-      // hide dropdown when ON
-      select.style.display = "none";
-
-      applyStudyMode(container, currentMode, button);
+      // hide the dropdown when study mode is ON
+      hideSelect(select);
+      applyStudyMode(container, currentMode, button, select);
       button.textContent = "Study Mode On";
       button.style.backgroundColor = "#98ff98ff";
+      button.disabled = false;
     } else {
-      // show dropdown again when OFF
-      select.style.display = "inline-block";
+      // show dropdown when study mode is OFF
+      showSelect(select);
 
+      // remove effects
       const nodes = container.querySelectorAll("g.node");
       nodes.forEach(node => {
         node.classList.remove("study-blur", "study-hide");
         const overlay = node.querySelector(".overlay-rect");
         if (overlay) overlay.remove();
+        node.onclick = null;
       });
 
       button.textContent = "Study Mode Off";
@@ -153,7 +213,6 @@ for (const [tabId, button] of Object.entries(toggleButtons)) {
     }
   });
 }
-
 
 // Tab switching
 tabs.forEach(tab => {
@@ -184,4 +243,3 @@ window.addEventListener("DOMContentLoaded", () => {
     loadDiagram(firstTab.dataset.tab);
   }
 });
-
