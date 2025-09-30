@@ -1,0 +1,12 @@
+/* Center all Mermaid diagrams */
+#diagram-area,
+.diagram-container {
+  text-align: center; /* center inline-block children */
+}
+
+/* Make Mermaid SVG diagrams inline-block to respect centering */
+.mermaid {
+  display: inline-block;
+  text-align: center; /* optional: center text inside diagram */
+  margin: 20px 0;    /* add some vertical spacing */
+}

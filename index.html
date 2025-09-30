@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metabolic Pathways</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      color: #333;
+    }
+
+    nav {
+      background: #2c3e50;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    nav a:hover {
+      background: #34495e;
+    }
+
+    nav a.active {
+      background: #1abc9c;
+    }
+
+    .content {
+      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .tab {
+      display: none;
+    }
+
+    .mermaid-container {
+      margin: 20px 0;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 15px 0;
+    }
+  </style>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <script type="module" src="script.js"></script>
+
+<nav>
+  <a href="#" class="tablink active" onclick="showTab(event, 'ppp.mmd')">Pentose Phosphate Pathway</a>
+  <a href="#" class="tablink" onclick="showTab(event, 'glycolysis.mmd')">Glycolysis</a>
+  <a href="#" class="tablink" onclick="showTab(event, 'krebbs.mmd')">Krebbs Cycle</a>
+</nav>
+
+<div id="diagram-area"></div>
+
+  </body>
+</html>
