@@ -1,12 +1,81 @@
-/* Center all Mermaid diagrams */
-#diagram-area,
-.diagram-container {
-  text-align: center; /* center inline-block children */
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  padding: 1rem;
 }
 
-/* Make Mermaid SVG diagrams inline-block to respect centering */
-.mermaid {
+nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  background: #2c3e50;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+nav a {
+  padding: 0.5rem 1rem;
+  background: #2c3e50;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+
+nav a.active {
+  background: #1abc9c;
+}
+
+.controls {
+  margin-bottom: 1rem;
+}
+
+#toggleStudy {
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.mermaid-wrapper {
   display: inline-block;
-  text-align: center; /* optional: center text inside diagram */
-  margin: 20px 0;    /* add some vertical spacing */
+  position: relative;
+  text-align: center;
+  width: 100%;
+}
+
+/* --- Blur mode (lighter blur) --- */
+.node.study-blur {
+  filter: blur(3.0px);
+  cursor: pointer;
+  transition: filter 0.3s ease;
+}
+.node.study-blur:hover {
+  filter: none;
+}
+
+/* Revealed nodes remove all effects */
+.node.revealed {
+  filter: none !important;
+}
+
+/* --- Blur/Hide mode color formatting --- */
+#modeSelect {
+  background-color: #2c3e50; /* nav bar color */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;       /* small vertical padding to shrink height */
+  font-size: 1rem;
+  line-height: normal;     /* let browser handle text centering */
+  cursor: pointer;
+  vertical-align: middle;  /* align with button */
+}
+
+#modeSelect option {
+  background-color: white;
+  color: black;
+  line-height: normal; /* keep dropdown items normal */
 }
