@@ -2,48 +2,131 @@ import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.mi
 
 mermaid.initialize({ startOnLoad: false });
 
-// Keep track of which file is currently displayed
-let currentDiagram = null;
+const diagramArea = document.getElementById("diagram-area");
+const tabs = document.querySelectorAll(".tablink");
+const toggleButton = document.getElementById("toggleStudy");
+const modeSelect = document.getElementById("modeSelect");
 
-// Show a diagram from a .mmd file
-async function showDiagram(file) {
-  const container = document.getElementById("diagram-area");
+let studyMode = false;
+let currentMode = "study-hide"; // default
 
-  // Remove any previous diagram
-  container.innerHTML = "";
+// Load a Mermaid diagram
+async function loadDiagram(file) {
+  diagramArea.innerHTML = "";
+  studyMode = false;
+  toggleButton.textContent = "Study Mode Off";
+  toggleButton.style.backgroundColor = "#f7a0a0";
 
   try {
     const response = await fetch(file);
     const text = await response.text();
 
-    // Create a div for the new diagram
     const diagramDiv = document.createElement("div");
     diagramDiv.className = "mermaid";
     diagramDiv.textContent = text;
+    diagramArea.appendChild(diagramDiv);
 
-    container.appendChild(diagramDiv);
-
-    // Render only this diagram
     mermaid.init({ startOnLoad: false }, diagramDiv);
-
-    currentDiagram = file;
   } catch (err) {
-    container.textContent = "Failed to load diagram: " + err;
+    diagramArea.textContent = "Failed to load diagram: " + err;
   }
 }
 
-// Tab click handler
-window.showTab = function(event, file) {
-  event.preventDefault();
+// Apply study mode to all nodes
+function applyStudyMode(mode) {
+  const nodes = diagramArea.querySelectorAll("g.node");
 
-  document.querySelectorAll(".tablink").forEach(tab => tab.classList.remove("active"));
-  event.currentTarget.classList.add("active");
+  nodes.forEach(node => {
+    node.classList.remove("study-blur", "study-hide", "revealed");
 
-  showDiagram(file);
-};
+    if (mode === "study-blur") {
+      node.classList.add("study-blur");
 
-// Load the first diagram on page load
+      node.addEventListener("click", () => {
+        if (node.classList.contains("study-blur")) {
+          node.classList.remove("study-blur");
+          node.classList.add("revealed");
+          checkAllRevealed();
+        }
+      });
+
+    } else if (mode === "study-hide") {
+      node.classList.add("study-hide");
+
+      const rect = node.querySelector("rect");
+      if (rect) {
+        const bbox = rect.getBBox();
+        const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        overlay.setAttribute("x", bbox.x);
+        overlay.setAttribute("y", bbox.y);
+        overlay.setAttribute("width", bbox.width);
+        overlay.setAttribute("height", bbox.height);
+        overlay.setAttribute("fill", "rgba(0, 120, 255, 0.9)");
+        overlay.setAttribute("class", "overlay-rect");
+        overlay.style.cursor = "pointer";
+
+        overlay.addEventListener("click", () => {
+          node.classList.remove("study-hide");
+          node.classList.add("revealed");
+          overlay.remove();
+          checkAllRevealed();
+        });
+
+        node.appendChild(overlay);
+      }
+    }
+  });
+}
+
+// Check if all nodes are revealed
+function checkAllRevealed() {
+  const nodes = diagramArea.querySelectorAll("g.node");
+  const allRevealed = Array.from(nodes).every(node => node.classList.contains("revealed"));
+  if (allRevealed) {
+    studyMode = false;
+    toggleButton.textContent = "Study Mode Off";
+    toggleButton.style.backgroundColor = "#f7a0a0";
+
+    nodes.forEach(node => {
+      node.classList.remove("study-blur", "study-hide");
+      const overlay = node.querySelector(".overlay-rect");
+      if (overlay) overlay.remove();
+    });
+  }
+}
+
+// Tab switching
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    loadDiagram(tab.dataset.file);
+  });
+});
+
+// Toggle study mode
+toggleButton.addEventListener("click", () => {
+  studyMode = !studyMode;
+  currentMode = modeSelect.value === "blur" ? "study-blur" : "study-hide";
+
+  if (studyMode) {
+    applyStudyMode(currentMode);
+    toggleButton.textContent = "Study Mode On";
+    toggleButton.style.backgroundColor = "#a0e7a0";
+  } else {
+    const nodes = diagramArea.querySelectorAll("g.node");
+    nodes.forEach(node => {
+      node.classList.remove("study-blur", "study-hide");
+      const overlay = node.querySelector(".overlay-rect");
+      if (overlay) overlay.remove();
+    });
+    toggleButton.textContent = "Study Mode Off";
+    toggleButton.style.backgroundColor = "#f7a0a0";
+  }
+});
+
+// Load first tab
 window.addEventListener("DOMContentLoaded", () => {
-  const firstTab = document.querySelector(".tablink");
-  if (firstTab) showDiagram(firstTab.getAttribute("onclick").match(/'(.+)'/)[1]);
+  const firstTab = document.querySelector(".tablink.active");
+  if (firstTab) loadDiagram(firstTab.dataset.file);
 });
