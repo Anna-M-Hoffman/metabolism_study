@@ -8,20 +8,73 @@
 </head>
 <body>
   <nav>
-    <a href="#" class="tablink active" data-file="ppp.mmd">Pentose Phosphate Pathway</a>
-    <a href="#" class="tablink" data-file="glycolysis.mmd">Glycolysis</a>
-    <a href="#" class="tablink" data-file="krebbs.mmd">Krebbs Cycle</a>
+    <a href="#" class="tablink active" data-tab="home">Home</a>
+    <a href="#" class="tablink" data-tab="ppp">Pentose Phosphate Pathway</a>
+    <a href="#" class="tablink" data-tab="glycolysis">Glycolysis</a>
+    <a href="#" class="tablink" data-tab="krebbs">Krebbs Cycle</a>
+    <a href="#" class="tablink" data-tab="about">About</a>
   </nav>
 
-  <div class="controls">
-    <select id="modeSelect">
+  <!-- Home -->
+  <div id="home" class="tab-content" style="display:block;">
+    <h1>Welcome to Metabolic Pathways Study Mode</h1>
+    <p>Select a pathway above to get started.</p>
+  </div>
+
+<!-- PPP Tab -->
+<div id="ppp" class="tab-content">
+  <h2>Pentose Phosphate Pathway (PPP)</h2>
+  <p>The pentose phosphate pathway generates NADPH and pentoses. It has oxidative and non-oxidative phases.</p>
+
+  <div class="diagram-header">
+    <select id="modeSelect-ppp">
       <option value="blur">Blur</option>
       <option value="hide">Hide</option>
     </select>
-    <button id="toggleStudy">Turn Study Mode On</button>
+    <button id="toggleStudy-ppp">Study Mode Off</button>
   </div>
 
-  <div id="diagram-area" class="mermaid-wrapper"></div>
+  <div id="ppp-diagram" class="mermaid-wrapper"></div>
+</div>
+
+<!-- Glycolysis Tab -->
+<div id="glycolysis" class="tab-content" style="display:none;">
+  <h2>Glycolysis</h2>
+  <p>Glycolysis breaks down glucose into pyruvate, producing ATP and NADH.</p>
+
+  <div class="diagram-header">
+    <select id="modeSelect-glycolysis">
+      <option value="blur">Blur</option>
+      <option value="hide">Hide</option>
+    </select>
+    <button id="toggleStudy-glycolysis">Study Mode Off</button>
+  </div>
+
+  <div id="glycolysis-diagram" class="mermaid-wrapper"></div>
+</div>
+
+<!-- Krebbs Cycle Tab -->
+<div id="krebbs" class="tab-content" style="display:none;">
+  <h2>Krebbs Cycle (Citric Acid Cycle)</h2>
+  <p>The Krebbs cycle oxidizes acetyl-CoA to CO₂ and generates NADH, FADH₂, and ATP.</p>
+
+  <div class="diagram-header">
+    <select id="modeSelect-krebbs">
+      <option value="blur">Blur</option>
+      <option value="hide">Hide</option>
+    </select>
+    <button id="toggleStudy-krebbs">Study Mode Off</button>
+  </div>
+
+  <div id="krebbs-diagram" class="mermaid-wrapper"></div>
+</div>
+
+
+  <!-- About -->
+  <div id="about" class="tab-content" style="display:none;">
+    <h1>About This Tool</h1>
+    <p>This tool helps you study metabolic pathways with interactive diagrams and study modes.</p>
+  </div>
 
   <script type="module" src="script.js"></script>
 </body>
