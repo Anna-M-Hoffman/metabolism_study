@@ -120,6 +120,7 @@ function checkAllRevealed(container, toggleButton) {
   }
 }
 
+
 // Initialize Study Mode buttons per tab
 for (const [tabId, button] of Object.entries(toggleButtons)) {
   const container = diagramContainers[tabId];
@@ -130,21 +131,29 @@ for (const [tabId, button] of Object.entries(toggleButtons)) {
     currentMode = select.value === "blur" ? "study-blur" : "study-hide";
 
     if (studyMode) {
+      // hide dropdown when ON
+      select.style.display = "none";
+
       applyStudyMode(container, currentMode, button);
       button.textContent = "Study Mode On";
       button.style.backgroundColor = "#98ff98ff";
     } else {
+      // show dropdown again when OFF
+      select.style.display = "inline-block";
+
       const nodes = container.querySelectorAll("g.node");
       nodes.forEach(node => {
         node.classList.remove("study-blur", "study-hide");
         const overlay = node.querySelector(".overlay-rect");
         if (overlay) overlay.remove();
       });
+
       button.textContent = "Study Mode Off";
       button.style.backgroundColor = "#ff7777ff";
     }
   });
 }
+
 
 // Tab switching
 tabs.forEach(tab => {
@@ -175,3 +184,4 @@ window.addEventListener("DOMContentLoaded", () => {
     loadDiagram(firstTab.dataset.tab);
   }
 });
+
