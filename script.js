@@ -45,6 +45,7 @@ async function loadDiagram(tabId) {
   const toggleButton = toggleButtons[tabId];
   toggleButton.textContent = "Study Mode Off";
   toggleButton.style.backgroundColor = "#ff7777ff";
+  modeSelects[tabId].style.display = "inline-block";
 
   try {
     const response = await fetch(diagrams[tabId]);
@@ -62,23 +63,32 @@ async function loadDiagram(tabId) {
 }
 
 // Apply study mode to all nodes in a container
-function applyStudyMode(container, mode, toggleButton) {
-  const nodes = container.querySelectorAll("g.node");
+function applyStudyMode(container, mode, toggleButton, select) {
+  if (!container) return;
 
+  const nodes = container.querySelectorAll("g.node");
   nodes.forEach(node => {
     node.classList.remove("study-blur", "study-hide", "revealed");
 
+    // Always make nodes clickable
+    node.style.cursor = "pointer";
+
     if (mode === "study-blur") {
       node.classList.add("study-blur");
-      node.addEventListener("click", () => {
+      node.onclick = function (e) {
+        e.stopPropagation();
         if (node.classList.contains("study-blur")) {
           node.classList.remove("study-blur");
           node.classList.add("revealed");
-          checkAllRevealed(container, toggleButton);
+        } else if (node.classList.contains("revealed")) {
+          node.classList.remove("revealed");
+          node.classList.add("study-blur");
         }
-      });
+        checkAllRevealed(container, toggleButton, select);
+      };
     } else if (mode === "study-hide") {
       node.classList.add("study-hide");
+
       const rect = node.querySelector("rect");
       if (rect) {
         const bbox = rect.getBBox();
@@ -90,28 +100,48 @@ function applyStudyMode(container, mode, toggleButton) {
         overlay.setAttribute("fill", "rgba(0,120,255,0.9)");
         overlay.setAttribute("class", "overlay-rect");
         overlay.style.cursor = "pointer";
-
-        overlay.addEventListener("click", () => {
-          node.classList.remove("study-hide");
-          node.classList.add("revealed");
-          overlay.remove();
-          checkAllRevealed(container, toggleButton);
-        });
-
         node.appendChild(overlay);
       }
+
+      node.onclick = function (e) {
+        e.stopPropagation();
+
+        if (node.classList.contains("study-hide")) {
+          node.classList.remove("study-hide");
+          node.classList.add("revealed");
+          const overlay = node.querySelector(".overlay-rect");
+          if (overlay) overlay.remove();
+        } else if (node.classList.contains("revealed")) {
+          node.classList.remove("revealed");
+          node.classList.add("study-hide");
+          if (!node.querySelector(".overlay-rect") && rect) {
+            const bbox = rect.getBBox();
+            const newOverlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            newOverlay.setAttribute("x", bbox.x);
+            newOverlay.setAttribute("y", bbox.y);
+            newOverlay.setAttribute("width", bbox.width);
+            newOverlay.setAttribute("height", bbox.height);
+            newOverlay.setAttribute("fill", "rgba(0,120,255,0.9)");
+            newOverlay.setAttribute("class", "overlay-rect");
+            newOverlay.style.cursor = "pointer";
+            node.appendChild(newOverlay);
+          }
+        }
+        checkAllRevealed(container, toggleButton, select);
+      };
     }
   });
 }
 
 // Check if all nodes revealed in a container
-function checkAllRevealed(container, toggleButton) {
+function checkAllRevealed(container, toggleButton, select) {
   const nodes = container.querySelectorAll("g.node");
-  const allRevealed = Array.from(nodes).every(n => n.classList.contains("revealed"));
+  const allRevealed = nodes.length > 0 && Array.from(nodes).every(n => n.classList.contains("revealed"));
   if (allRevealed) {
     studyMode = false;
     toggleButton.textContent = "Study Mode Off";
     toggleButton.style.backgroundColor = "#ff7777ff";
+    if (select) select.style.display = "inline-block";
     nodes.forEach(node => {
       node.classList.remove("study-blur", "study-hide");
       const overlay = node.querySelector(".overlay-rect");
@@ -119,7 +149,6 @@ function checkAllRevealed(container, toggleButton) {
     });
   }
 }
-
 
 // Initialize Study Mode buttons per tab
 for (const [tabId, button] of Object.entries(toggleButtons)) {
@@ -131,29 +160,23 @@ for (const [tabId, button] of Object.entries(toggleButtons)) {
     currentMode = select.value === "blur" ? "study-blur" : "study-hide";
 
     if (studyMode) {
-      // hide dropdown when ON
       select.style.display = "none";
-
-      applyStudyMode(container, currentMode, button);
+      applyStudyMode(container, currentMode, button, select);
       button.textContent = "Study Mode On";
       button.style.backgroundColor = "#98ff98ff";
     } else {
-      // show dropdown again when OFF
       select.style.display = "inline-block";
-
       const nodes = container.querySelectorAll("g.node");
       nodes.forEach(node => {
         node.classList.remove("study-blur", "study-hide");
         const overlay = node.querySelector(".overlay-rect");
         if (overlay) overlay.remove();
       });
-
       button.textContent = "Study Mode Off";
       button.style.backgroundColor = "#ff7777ff";
     }
   });
 }
-
 
 // Tab switching
 tabs.forEach(tab => {
@@ -184,4 +207,3 @@ window.addEventListener("DOMContentLoaded", () => {
     loadDiagram(firstTab.dataset.tab);
   }
 });
-

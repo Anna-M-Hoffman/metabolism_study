@@ -108,7 +108,7 @@ nav a:hover {
   cursor: pointer;
   transition: filter 0.3s ease;
 }
-.node.study-blur:hover {
+.node.study-blur.js-hover:hover {
   filter: none;
 }
 
