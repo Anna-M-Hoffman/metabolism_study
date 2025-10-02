@@ -1,3 +1,108 @@
 graph TD
-  G6P[Glucose-6-Phosphate] --> 6PG[6-Phosphogluconate]
-  6PG --> Ru5P[Ribulose-5-Phosphate]
+
+subgraph 1_outer[" "]
+    1["Glucose 6-phosphate"]
+end
+    
+    2["Glucose 6-phosphate dehydrogenase \nNADP+ -> NADPH"]
+
+subgraph 3_outer[" "]
+    3["6-Phosphogluconolactone"]
+end
+
+    4["Gluconolactonase \nH2O -> H+"]
+
+subgraph 5_outer[" "]
+    5["6-Phosphogluconate"]
+end
+
+
+    6["6-Phosphogluconate dehydrogenase \nNADP+ -> NADPH CO2"]
+
+
+subgraph 7_outer[" "]
+    7["Ribulose 5-phosphate"]
+end
+
+    8["Ribose 5-phosphate isomerase"]
+
+
+    9["Ribulose 5-phosphate 3-epimerase"]
+
+
+subgraph 10_outer[" "]
+    10["Ribose 5-phosphate"]
+end
+
+subgraph 11_outer[" "]
+    11["Xylulose 5-phosphate"]
+end
+
+
+    12["Transketolase"]
+
+
+subgraph 13-14_outer["\nAND"]
+    13["Glyceraldehyde 3-phosphate"]
+    14["Sedoheptulose 7-phosphate"]
+end
+
+
+    15["Transaldolase"]
+
+
+subgraph 16-17_outer["\nAND"]
+    16["Fructose 6-phosphate"]
+    17["Erythrose 4-phosphate"]
+end
+
+subgraph 18_outer[" "]
+    18["Xylulose 5-phosphate"]
+end
+
+
+    19["Glycolysis"]
+
+    20["Transketolase"]
+
+subgraph 21-22_outer["AND"]
+    21["Glyceraldehyde 3-phosphate"]
+    22["Fructose 6-phosphate"]
+end
+
+    23["Glycolysis"]
+
+    24["Glycolysis"]
+
+1_outer --> 2
+2 --> 3_outer
+3_outer --> 4
+4 --> 5_outer
+5_outer --> 6
+6 --> 7_outer
+
+7_outer --> 8
+7_outer --> 9
+
+8 --> 10_outer
+9 --> 11_outer
+
+10_outer --> 12
+11_outer --> 12
+
+12 --> 13-14_outer
+13-14_outer --> 15
+15 --> 16-17_outer
+
+16 --> 19
+19 --> 16
+17 --> 20
+18_outer --> 20
+
+20 --> 21-22_outer
+
+21 --> 23
+23 --> 21
+
+22 --> 24
+24 --> 22

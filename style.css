@@ -135,3 +135,24 @@ nav a:hover {
   color: black;
   line-height: normal; /* keep dropdown items normal */
 }
+
+g.node.study-blur rect,
+g.node.study-blur text,
+g.edgeLabel.study-blur text {
+  filter: blur(2px);
+  pointer-events: all;
+}
+
+g.node.study-hide rect,
+g.node.study-hide text,
+g.edgeLabel.study-hide text {
+  fill: transparent;
+  pointer-events: all;
+}
+
+g.node.revealed rect,
+g.node.revealed text,
+g.edgeLabel.revealed text {
+  filter: none;
+  fill: currentColor;
+}
