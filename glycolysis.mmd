@@ -1,11 +1,105 @@
 graph TD
-    Glc[Glucose] --> G6P[Glucose-6-Phosphate]
-    G6P --> F6P[Fructose-6-Phosphate]
-    F6P --> F16BP[Fructose-1,6-Bisphosphate]
-    F16BP --> DHAP[Dihydroxyacetone Phosphate]
-    F16BP --> G3P[Glyceraldehyde-3-Phosphate]
-    G3P --> BPG[1,3-Bisphosphoglycerate]
-    BPG --> 3PG[3-Phosphoglycerate]
-    3PG --> 2PG[2-Phosphoglycerate]
-    2PG --> PEP[Phosphoenolpyruvate]
-    PEP --> Pyr[Pyruvate]
+
+subgraph 1_outer[" "]
+    1["Glucose"]
+end
+    
+    2["Hexokinase \nATP -> ADP + Pi"]
+
+subgraph 3_outer[" "]
+    3["Glucose 6-phosphate"]
+end
+
+    4["Glucose 6-phosphate isomerase"]
+
+subgraph 5_outer[" "]
+    5["Fructose 6-phosphate"]
+end
+
+    6["Phosphofructokinase-1 \nATP -> ADP + Pi"]
+
+subgraph 7_outer[" "]
+    7["Fructose 1,6-bisphosphate"]
+end
+
+    8["Fructose-bisphosphate aldolase"]
+
+
+subgraph 9_outer[" "]
+    9["Dihydroxyacetone phosphate"]
+end
+
+subgraph 10_outer[" "]
+    10["Glyceraldehyde 3-phosphate"]
+end
+
+    11["Triosephosphate isomerase"]
+
+    12["Same process as right side,\nresulting in double of everything \nstarting at glyceraldehyde phosphate \ndehydrogenase and below"]
+
+subgraph 13_outer[" "]
+    13["Glyceraldehyde 3-phosphate"]
+end
+
+    14["Glyceraldehyde phosphate dehydrogenase \nNAD+, H2PO4 -> NADH, H+"]
+
+subgraph 15_outer[" "]
+    15["1,3-Bisphosphoglycerate"]
+end
+
+    16["Phosphoglycerate kinase \nADP + H+ -> ATP"]
+
+
+subgraph 17_outer[" "]
+    17["3-Phosphoglycerate"]
+end
+
+    18["Phosphoglycerate mutase"]
+
+
+subgraph 19_outer[" "]
+    19["2-Phosphoglycerate"]
+end
+
+    20["Endolase \n--water"]
+
+subgraph 21_outer[" "]
+    21["Phosphoenolpyruvate"]
+end
+
+    22["Pyruvate kinase \nADP + H+ -> ATP"]
+
+
+subgraph 23_outer[" "]
+    23["Pyruvate"]
+end
+
+
+
+1_outer --> 2
+2 --> 3_outer
+3_outer --> 4
+4 --> 5_outer
+5_outer --> 6
+6 --> 7_outer
+7_outer --> 8
+
+8 --> 9_outer
+8 --> 10_outer
+
+10_outer --> 12
+12 --> 14
+
+9_outer --> 11
+11 --> 13_outer
+13_outer --> 14
+14 --> 15_outer
+15_outer --> 16
+16 --> 17_outer
+17_outer --> 18
+18 --> 19_outer
+19_outer --> 20
+20 --> 21_outer
+21_outer --> 22
+22 --> 23_outer
+
