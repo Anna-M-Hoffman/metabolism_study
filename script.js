@@ -1,27 +1,25 @@
 import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+
 mermaid.initialize({ startOnLoad: false });
 
 const tabs = document.querySelectorAll(".tablink");
 const tabContents = document.querySelectorAll(".tab-content");
 
 let studyMode = false;
-let currentMode = "study-hide"; // default
+let currentMode = "study-hide";
 
-// Store diagram containers by tab
 const diagramContainers = {
   ppp: document.getElementById("ppp-diagram"),
   glycolysis: document.getElementById("glycolysis-diagram"),
   krebbs: document.getElementById("krebbs-diagram")
 };
 
-// Map tab to .mmd file
 const diagrams = {
   ppp: "ppp.mmd",
   glycolysis: "glycolysis.mmd",
   krebbs: "krebbs.mmd"
 };
 
-// Store toggle buttons and selects per tab
 const toggleButtons = {
   ppp: document.getElementById("toggleStudy-ppp"),
   glycolysis: document.getElementById("toggleStudy-glycolysis"),
@@ -34,40 +32,15 @@ const modeSelects = {
   krebbs: document.getElementById("modeSelect-krebbs")
 };
 
-// helpers to show/hide select
-function showSelect(select) {
-  if (!select) return;
-  select.style.display = "";
-}
-function hideSelect(select) {
-  if (!select) return;
-  select.style.display = "none";
-}
-
-// clear overlays, classes and handlers
-function resetNodes(container) {
-  if (!container) return;
-  const nodes = container.querySelectorAll("g.node");
-  nodes.forEach(node => {
-    node.classList.remove("study-blur", "study-hide", "revealed");
-    const overlay = node.querySelector(".overlay-rect");
-    if (overlay) overlay.remove();
-    node.onclick = null;
-  });
-}
-
-// Load Mermaid diagram for a tab
 async function loadDiagram(tabId) {
   const container = diagramContainers[tabId];
   if (!container) return;
 
-  container.innerHTML = ""; // Clear old diagram
+  container.innerHTML = "";
   studyMode = false;
-
-  // reset toggle button/select visuals for this tab
   const toggleButton = toggleButtons[tabId];
-  toggleButton.textContent = "Study Mode Off";
-  toggleButton.style.backgroundColor = "#ff7777ff";
+  toggleButton.textContent = "Turn Study Mode On";
+  toggleButton.style.backgroundColor = "#98ff98";
   modeSelects[tabId].style.display = "inline-block";
 
   try {
@@ -79,24 +52,18 @@ async function loadDiagram(tabId) {
     diagramDiv.textContent = text;
     container.appendChild(diagramDiv);
 
-    await mermaid.init({ startOnLoad: false }, diagramDiv);
-
-    // make sure nodes are clean after render
-    resetNodes(container);
+    mermaid.init({ startOnLoad: false }, diagramDiv);
   } catch (err) {
     container.textContent = "Failed to load diagram: " + err;
   }
 }
 
-// Apply study mode to all nodes in a container
 function applyStudyMode(container, mode, toggleButton, select) {
   if (!container) return;
-
   const nodes = container.querySelectorAll("g.node");
+
   nodes.forEach(node => {
     node.classList.remove("study-blur", "study-hide", "revealed");
-
-    // Always make nodes clickable
     node.style.cursor = "pointer";
 
     if (mode === "study-blur") {
@@ -131,7 +98,6 @@ function applyStudyMode(container, mode, toggleButton, select) {
 
       node.onclick = function (e) {
         e.stopPropagation();
-
         if (node.classList.contains("study-hide")) {
           node.classList.remove("study-hide");
           node.classList.add("revealed");
@@ -159,31 +125,25 @@ function applyStudyMode(container, mode, toggleButton, select) {
   });
 }
 
-// Check if all nodes revealed in a container
 function checkAllRevealed(container, toggleButton, select) {
   const nodes = container.querySelectorAll("g.node");
   const allRevealed = nodes.length > 0 && Array.from(nodes).every(n => n.classList.contains("revealed"));
   if (allRevealed) {
     studyMode = false;
-    toggleButton.textContent = "Study Mode Off";
-    toggleButton.style.backgroundColor = "#ff7777ff";
+    toggleButton.textContent = "Turn Study Mode On";
+    toggleButton.style.backgroundColor = "#98ff98";
     if (select) select.style.display = "inline-block";
     nodes.forEach(node => {
       node.classList.remove("study-blur", "study-hide");
       const overlay = node.querySelector(".overlay-rect");
       if (overlay) overlay.remove();
-      node.onclick = null;
     });
   }
 }
 
-// Initialize Study Mode buttons per tab
 for (const [tabId, button] of Object.entries(toggleButtons)) {
   const container = diagramContainers[tabId];
   const select = modeSelects[tabId];
-
-  // guard for missing DOM nodes
-  if (!button || !container || !select) continue;
 
   button.addEventListener("click", () => {
     studyMode = !studyMode;
@@ -192,9 +152,8 @@ for (const [tabId, button] of Object.entries(toggleButtons)) {
     if (studyMode) {
       select.style.display = "none";
       applyStudyMode(container, currentMode, button, select);
-      button.textContent = "Study Mode On";
-      button.style.backgroundColor = "#98ff98ff";
-      button.disabled = false;
+      button.textContent = "Turn Study Mode Off";
+      button.style.backgroundColor = "#ff7777";
     } else {
       select.style.display = "inline-block";
       const nodes = container.querySelectorAll("g.node");
@@ -202,40 +161,30 @@ for (const [tabId, button] of Object.entries(toggleButtons)) {
         node.classList.remove("study-blur", "study-hide");
         const overlay = node.querySelector(".overlay-rect");
         if (overlay) overlay.remove();
-        node.onclick = null;
       });
-      button.textContent = "Study Mode Off";
-      button.style.backgroundColor = "#ff7777ff";
+      button.textContent = "Turn Study Mode On";
+      button.style.backgroundColor = "#98ff98";
     }
   });
 }
 
-// Tab switching
 tabs.forEach(tab => {
   tab.addEventListener("click", e => {
     e.preventDefault();
     const target = tab.dataset.tab;
 
-    // Activate tab button
     tabs.forEach(t => t.classList.remove("active"));
     tab.classList.add("active");
 
-    // Show tab content
     tabContents.forEach(tc => {
       tc.style.display = (tc.id === target) ? "block" : "none";
     });
 
-    // Load diagram for this tab if it has one
-    if (diagrams[target]) {
-      loadDiagram(target);
-    }
+    if (diagrams[target]) loadDiagram(target);
   });
 });
 
-// Load first active tab
 window.addEventListener("DOMContentLoaded", () => {
   const firstTab = document.querySelector(".tablink.active");
-  if (firstTab && diagrams[firstTab.dataset.tab]) {
-    loadDiagram(firstTab.dataset.tab);
-  }
+  if (firstTab && diagrams[firstTab.dataset.tab]) loadDiagram(firstTab.dataset.tab);
 });
