@@ -66,13 +66,9 @@ async function loadDiagram(tabId) {
 
   // reset toggle button/select visuals for this tab
   const toggleButton = toggleButtons[tabId];
-  const select = modeSelects[tabId];
-  if (toggleButton) {
-    toggleButton.textContent = "Study Mode Off";
-    toggleButton.style.backgroundColor = "#ff7777ff";
-    toggleButton.disabled = false;
-  }
-  showSelect(select);
+  toggleButton.textContent = "Study Mode Off";
+  toggleButton.style.backgroundColor = "#ff7777ff";
+  modeSelects[tabId].style.display = "inline-block";
 
   try {
     const response = await fetch(diagrams[tabId]);
@@ -93,15 +89,15 @@ async function loadDiagram(tabId) {
 }
 
 // Apply study mode to all nodes in a container
-// NOTE: we pass `select` so checkAllRevealed can restore it when needed
 function applyStudyMode(container, mode, toggleButton, select) {
   if (!container) return;
-  // clear previous state
-  resetNodes(container);
 
   const nodes = container.querySelectorAll("g.node");
   nodes.forEach(node => {
     node.classList.remove("study-blur", "study-hide", "revealed");
+
+    // Always make nodes clickable
+    node.style.cursor = "pointer";
 
     if (mode === "study-blur") {
       node.classList.add("study-blur");
@@ -110,11 +106,15 @@ function applyStudyMode(container, mode, toggleButton, select) {
         if (node.classList.contains("study-blur")) {
           node.classList.remove("study-blur");
           node.classList.add("revealed");
-          checkAllRevealed(container, toggleButton, select);
+        } else if (node.classList.contains("revealed")) {
+          node.classList.remove("revealed");
+          node.classList.add("study-blur");
         }
+        checkAllRevealed(container, toggleButton, select);
       };
     } else if (mode === "study-hide") {
       node.classList.add("study-hide");
+
       const rect = node.querySelector("rect");
       if (rect) {
         const bbox = rect.getBBox();
@@ -126,25 +126,33 @@ function applyStudyMode(container, mode, toggleButton, select) {
         overlay.setAttribute("fill", "rgba(0,120,255,0.9)");
         overlay.setAttribute("class", "overlay-rect");
         overlay.style.cursor = "pointer";
-
-        overlay.onclick = function (e) {
-          e.stopPropagation();
-          node.classList.remove("study-hide");
-          node.classList.add("revealed");
-          overlay.remove();
-          checkAllRevealed(container, toggleButton, select);
-        };
-
         node.appendChild(overlay);
       }
 
-      // fallback: clicking node reveals
       node.onclick = function (e) {
         e.stopPropagation();
-        const ov = node.querySelector(".overlay-rect");
-        if (ov) ov.remove();
-        node.classList.remove("study-hide");
-        node.classList.add("revealed");
+
+        if (node.classList.contains("study-hide")) {
+          node.classList.remove("study-hide");
+          node.classList.add("revealed");
+          const overlay = node.querySelector(".overlay-rect");
+          if (overlay) overlay.remove();
+        } else if (node.classList.contains("revealed")) {
+          node.classList.remove("revealed");
+          node.classList.add("study-hide");
+          if (!node.querySelector(".overlay-rect") && rect) {
+            const bbox = rect.getBBox();
+            const newOverlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            newOverlay.setAttribute("x", bbox.x);
+            newOverlay.setAttribute("y", bbox.y);
+            newOverlay.setAttribute("width", bbox.width);
+            newOverlay.setAttribute("height", bbox.height);
+            newOverlay.setAttribute("fill", "rgba(0,120,255,0.9)");
+            newOverlay.setAttribute("class", "overlay-rect");
+            newOverlay.style.cursor = "pointer";
+            node.appendChild(newOverlay);
+          }
+        }
         checkAllRevealed(container, toggleButton, select);
       };
     }
@@ -154,19 +162,12 @@ function applyStudyMode(container, mode, toggleButton, select) {
 // Check if all nodes revealed in a container
 function checkAllRevealed(container, toggleButton, select) {
   const nodes = container.querySelectorAll("g.node");
-  // if no nodes, don't treat as all revealed
   const allRevealed = nodes.length > 0 && Array.from(nodes).every(n => n.classList.contains("revealed"));
   if (allRevealed) {
     studyMode = false;
-    if (toggleButton) {
-      toggleButton.textContent = "Study Mode Off";
-      toggleButton.style.backgroundColor = "#ff7777ff";
-      toggleButton.disabled = false;
-    }
-    // ensure select reappears when auto-off triggers
-    showSelect(select);
-
-    // cleanup classes and overlays defensively
+    toggleButton.textContent = "Study Mode Off";
+    toggleButton.style.backgroundColor = "#ff7777ff";
+    if (select) select.style.display = "inline-block";
     nodes.forEach(node => {
       node.classList.remove("study-blur", "study-hide");
       const overlay = node.querySelector(".overlay-rect");
@@ -189,17 +190,13 @@ for (const [tabId, button] of Object.entries(toggleButtons)) {
     currentMode = select.value === "blur" ? "study-blur" : "study-hide";
 
     if (studyMode) {
-      // hide the dropdown when study mode is ON
-      hideSelect(select);
+      select.style.display = "none";
       applyStudyMode(container, currentMode, button, select);
       button.textContent = "Study Mode On";
       button.style.backgroundColor = "#98ff98ff";
       button.disabled = false;
     } else {
-      // show dropdown when study mode is OFF
-      showSelect(select);
-
-      // remove effects
+      select.style.display = "inline-block";
       const nodes = container.querySelectorAll("g.node");
       nodes.forEach(node => {
         node.classList.remove("study-blur", "study-hide");
@@ -207,7 +204,6 @@ for (const [tabId, button] of Object.entries(toggleButtons)) {
         if (overlay) overlay.remove();
         node.onclick = null;
       });
-
       button.textContent = "Study Mode Off";
       button.style.backgroundColor = "#ff7777ff";
     }
@@ -243,12 +239,3 @@ window.addEventListener("DOMContentLoaded", () => {
     loadDiagram(firstTab.dataset.tab);
   }
 });
-
-
-
-
-
-
-
-
-
