@@ -1,4 +1,108 @@
 graph TD
-  AcCoA[Acetyl-CoA] --> Citrate[Citrate]
-  Citrate --> aKG[α-Ketoglutarate]
-  aKG --> SuccinylCoA[Succinyl-CoA]
+
+subgraph 1_outer[" "]
+    1["Pyruvate"]
+end
+    
+    2["Pyruvate carboxylase \nHCO3- + ATP -> ADP + Pi"]
+
+    3["Pyruvate dehydrogenase \nCoA-SH + NAD+ -> CO2 + NADH, H+"]
+
+
+subgraph 5_outer[" "]
+    5["Oxaloacetate"]
+end
+
+    
+subgraph 6_outer[" "]
+    6["Acetyl-CoA"]
+end
+
+
+    7["++ water \nCitrate synthase \n -- CoA-SH"]
+
+
+subgraph 8_outer[" "]
+    8["Citrate"]
+end
+
+    9["-- water \nAconitase"]
+
+
+subgraph 10_outer[" "]
+    10["cis-Aconitate"]
+end
+
+    11["++ water \nAconitase"]
+
+subgraph 12_outer[" "]
+    12["D-Isocitrate"]
+end
+
+
+    13["NAD+ -> NADH, H+ \nIsocitrate dehydrogenase \n-- CO2"]
+
+
+subgraph 14_outer[" "]
+    14["alpha-ketoglutarate"]
+end
+
+
+    15["alpha-ketoglutarate dehydrogenase \nNAD+ + CoA-SH -> NADH, H+ + CO2"]
+
+
+subgraph 16_outer[" "]
+    16["Succinyl-CoA"]
+end
+
+    17["Succinyl-CoA synthetase \nGDP + Pi -> CoA-SH + GTP"]
+
+subgraph 18_outer[" "]
+    18["Succinate"]
+end
+
+    19["Succinic dehydrogenase \nQ -> QH2"]
+
+
+subgraph 20_outer[" "]
+    20["Fumarate"]
+end
+
+    21["Fumarase \n ++ water"]
+
+subgraph 22_outer[" "]
+    22["Malate"]
+end
+
+    23["Malate dehydrogenase \nNAD+ -> NADH, H+"]
+
+
+
+1_outer --> 2
+1_outer --> 3
+
+2 --> 5_outer
+
+3 --> 6_outer
+
+6_outer --> 7
+5_outer --> 7
+
+7 --> 8_outer
+8_outer --> 9
+9 --> 10_outer
+10_outer --> 11
+11 --> 12_outer
+12_outer --> 13
+13 --> 14_outer
+14_outer --> 15
+15 --> 16_outer
+16_outer --> 17
+17 --> 18_outer
+18_outer --> 19
+19 --> 20_outer
+20_outer --> 21
+21 --> 22_outer
+22 --> 23
+
+23 --> 5_outer
