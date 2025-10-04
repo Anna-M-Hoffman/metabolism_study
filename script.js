@@ -188,3 +188,16 @@ window.addEventListener("DOMContentLoaded", () => {
   const firstTab = document.querySelector(".tablink.active");
   if (firstTab && diagrams[firstTab.dataset.tab]) loadDiagram(firstTab.dataset.tab);
 });
+
+node.addEventListener("pointerdown", (e) => {
+    e.stopPropagation();
+    if (node.classList.contains("study-blur")) {
+        node.classList.remove("study-blur");
+        node.classList.add("revealed");
+    } else if (node.classList.contains("revealed")) {
+        node.classList.remove("revealed");
+        node.classList.add("study-blur");
+    }
+    checkAllRevealed(container, toggleButton, select);
+});
+

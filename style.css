@@ -9,6 +9,7 @@ nav {
   background: #2c3e50;
 }
 
+
 nav a {
   color: white;
   text-decoration: none;
@@ -30,11 +31,14 @@ nav a:hover {
 .tab-content {
   display: none;
   padding: 2rem;
-  min-height: 300px;
+  min-height: 100vh;
   color: white;
   border-radius: 8px;
   margin: 1rem;
+  overflow-x: auto;         /* allow horizontal scroll if needed */
 }
+
+
 
 /* Background gradients per tab */
 #home { background: linear-gradient(135deg, #6a11cb, #2575fc); }
@@ -107,7 +111,10 @@ nav a:hover {
   filter: blur(3.0px);
   cursor: pointer;
   transition: filter 0.3s ease;
+  touch-action: manipulation; 
 }
+
+
 .node.study-blur.js-hover:hover {
   filter: none;
 }
