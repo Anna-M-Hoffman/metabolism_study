@@ -2,13 +2,14 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
 }
 
 nav {
   display: flex;
   background: #2c3e50;
+  flex-wrap: wrap;
 }
-
 
 nav a {
   color: white;
@@ -28,42 +29,34 @@ nav a:hover {
   background: #34495e;
 }
 
+@media (max-width: 480px) {
+  nav {
+    flex-direction: column;
+  }
+  nav a {
+    flex-grow: 0;
+  }
+}
+
 .tab-content {
   display: none;
-  padding: 2rem;
+  padding: 1rem;
   min-height: 100vh;
   color: white;
   border-radius: 8px;
   margin: 1rem;
-  overflow-x: auto;         /* allow horizontal scroll if needed */
+  overflow-x: auto;
+  box-sizing: border-box;
 }
 
-
-
-/* Background gradients per tab */
 #home { background: linear-gradient(135deg, #6a11cb, #2575fc); }
-#ppp { background: linear-gradient(135deg, #a6f9c4, #3fe5ff); }
-#glycolysis { background: linear-gradient(135deg, #ff9ee3, #93baff); }
-#krebbs { background: linear-gradient(135deg, #ffa95e, #ff95e1); }
+#ppp { background: linear-gradient(135deg, #a6f9c4, #3fe5ff); color: black; }
+#glycolysis { background: linear-gradient(135deg, #ff9ee3, #93baff); color: black; }
+#krebbs { background: linear-gradient(135deg, #ffa95e, #ff95e1); color: black; }
 #about { background: linear-gradient(135deg, #18b43f, #cbf630); }
 
 .controls {
   margin-top: 1rem;
-}
-
-/* PPP tab text color */
-#ppp {
-  color: black;
-}
-
-/* Glycolysis tab text color */
-#glycolysis {
-  color: black;
-}
-
-/* Krebbs Cycle tab text color */
-#krebbs {
-  color: black;
 }
 
 #toggleStudy {
@@ -74,23 +67,18 @@ nav a:hover {
   cursor: pointer;
 }
 
-/* Wrapper to center Mermaid diagrams */
 .mermaid-wrapper {
-  text-align: center;   /* center child inline elements */
-  margin-top: 1rem;
-  margin-bottom: 2rem;
+  text-align: center;
+  margin: 1rem 0 2rem 0;
 }
 
-/* Mermaid diagram inside the wrapper */
 .mermaid-wrapper .mermaid {
-  display: inline-block; /* allow horizontal centering */
+  display: inline-block;
   width: 100%;
-  max-width: 1000px;    /* optional max width */
+  max-width: 1000px;
   height: auto;
 }
 
-
-/* Position the controls top-right above the diagram */
 .diagram-header {
   display: flex;
   justify-content: flex-end;
@@ -99,48 +87,87 @@ nav a:hover {
   margin-bottom: 0.5rem;
 }
 
-/* Optional: smaller toggle and select for compact top-right appearance */
 .diagram-header select,
 .diagram-header button {
   padding: 0.3rem 0.6rem;
   font-size: 0.9rem;
 }
 
-/* --- Blur mode (lighter blur) --- */
 .node.study-blur {
-  filter: blur(3.0px);
+  filter: blur(3px);
   cursor: pointer;
   transition: filter 0.3s ease;
-  touch-action: manipulation; 
+  touch-action: manipulation;
 }
-
 
 .node.study-blur.js-hover:hover {
   filter: none;
 }
 
-/* Revealed nodes remove all effects */
 .node.revealed {
   filter: none !important;
 }
 
-/* --- Blur/Hide mode color formatting --- */
 #modeSelect {
-  background-color: #2c3e50; /* nav bar color */
+  background-color: #2c3e50;
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 4px 8px;       /* small vertical padding to shrink height */
+  padding: 4px 8px;
   font-size: 1rem;
-  line-height: normal;     /* let browser handle text centering */
+  line-height: normal;
   cursor: pointer;
-  vertical-align: middle;  /* align with button */
+  vertical-align: middle;
 }
 
 #modeSelect option {
   background-color: white;
   color: black;
-  line-height: normal; /* keep dropdown items normal */
+  line-height: normal;
+}
+
+g.node.study-blur rect,
+g.node.study-blur text,
+g.edgeLabel.study-blur text {
+  filter: blur(2px);
+  pointer-events: all;
+}
+
+g.node.study-hide rect,
+g.node.study-hide text,
+g.edgeLabel.study-hide text {
+  fill: transparent;
+  pointer-events: all;
+}
+
+g.node.revealed rect,
+g.node.revealed text,
+g.edgeLabel.revealed text {
+  filter: none;
+  fill: currentColor;
+}
+
+.node.study-blur {
+  filter: blur(3px);
+  cursor: pointer;
+  transition: filter 0.2s ease;
+  touch-action: manipulation;
+}
+
+@media (hover: hover) {
+  .node.study-blur:hover {
+    filter: none;
+  }
+}
+
+@media (hover: none) {
+  .node.study-blur {
+    transition: none;
+  }
+}
+
+.node.revealed {
+  filter: none !important;
 }
 
 g.node.study-blur rect,
