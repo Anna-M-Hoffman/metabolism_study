@@ -21,21 +21,12 @@ nav a {
   transition: background 0.3s;
 }
 
-nav a.active {
-  background: #1abc9c;
-}
-
-nav a:hover {
-  background: #34495e;
-}
+nav a.active { background: #1abc9c; }
+nav a:hover { background: #34495e; }
 
 @media (max-width: 480px) {
-  nav {
-    flex-direction: column;
-  }
-  nav a {
-    flex-grow: 0;
-  }
+  nav { flex-direction: column; }
+  nav a { flex-grow: 0; }
 }
 
 .tab-content {
@@ -55,9 +46,7 @@ nav a:hover {
 #krebbs { background: linear-gradient(135deg, #ffa95e, #ff95e1); color: black; }
 #about { background: linear-gradient(135deg, #18b43f, #cbf630); }
 
-.controls {
-  margin-top: 1rem;
-}
+.controls { margin-top: 1rem; }
 
 #toggleStudy {
   font-weight: bold;
@@ -93,19 +82,51 @@ nav a:hover {
   font-size: 0.9rem;
 }
 
+/* --- Study Mode Styles --- */
 .node.study-blur {
   filter: blur(3px);
   cursor: pointer;
   transition: filter 0.3s ease;
   touch-action: manipulation;
+  pointer-events: all;
 }
 
-.node.study-blur.js-hover:hover {
+.node.study-hide rect,
+.node.study-hide text,
+.node.study-hide tspan,
+.node.study-hide title {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.node.revealed rect,
+.node.revealed text,
+.node.revealed tspan,
+.node.revealed title {
   filter: none;
+  fill: currentColor;
+  pointer-events: auto;
 }
 
-.node.revealed {
+/* temporary (hover) reveal controlled by JS */
+.node.study-blur.hovering { filter: none !important; }
+
+/* keep SVG children in sync */
+g.node.study-blur.hovering rect,
+g.node.study-blur.hovering text,
+g.node.study-blur.hovering tspan {
   filter: none !important;
+}
+
+/* Desktop: allow real hover if you prefer (optional, but JS now controls hovering) */
+@media (hover: hover) {
+  /* you can keep a hover visual if desired, but JS 'hovering' has priority */
+  .node.study-blur:hover { /* optional fallback */ }
+}
+
+/* Mobile / touch: don't rely on :hover transitions */
+@media (hover: none) {
+  .node.study-blur { transition: none; }
 }
 
 #modeSelect {
@@ -119,74 +140,8 @@ nav a:hover {
   cursor: pointer;
   vertical-align: middle;
 }
-
 #modeSelect option {
   background-color: white;
   color: black;
   line-height: normal;
-}
-
-g.node.study-blur rect,
-g.node.study-blur text,
-g.edgeLabel.study-blur text {
-  filter: blur(2px);
-  pointer-events: all;
-}
-
-g.node.study-hide rect,
-g.node.study-hide text,
-g.edgeLabel.study-hide text {
-  fill: transparent;
-  pointer-events: all;
-}
-
-g.node.revealed rect,
-g.node.revealed text,
-g.edgeLabel.revealed text {
-  filter: none;
-  fill: currentColor;
-}
-
-.node.study-blur {
-  filter: blur(3px);
-  cursor: pointer;
-  transition: filter 0.2s ease;
-  touch-action: manipulation;
-}
-
-@media (hover: hover) {
-  .node.study-blur:hover {
-    filter: none;
-  }
-}
-
-@media (hover: none) {
-  .node.study-blur {
-    transition: none;
-  }
-}
-
-.node.revealed {
-  filter: none !important;
-}
-
-g.node.study-blur rect,
-g.node.study-blur text,
-g.edgeLabel.study-blur text {
-  filter: blur(2px);
-  pointer-events: all;
-}
-
-g.node.study-hide rect,
-g.node.study-hide text,
-g.edgeLabel.study-hide text {
-  fill: transparent;
-  pointer-events: all;
-}
-
-g.node.revealed rect,
-g.node.revealed text,
-g.edgeLabel.revealed text {
-  filter: none;
-  fill: currentColor;
 }
