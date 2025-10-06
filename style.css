@@ -84,7 +84,7 @@ nav a:hover { background: #34495e; }
 
 /* --- Study Mode Styles --- */
 .node.study-blur {
-  filter: blur(2px);
+  filter: blur(3px);
   cursor: pointer;
   transition: filter 0.3s ease;
   touch-action: manipulation;
