@@ -11,7 +11,7 @@ A web-based interactive learning tool to explore major biochemical pathways:
 - **Glycolysis**
 - **Citric Acid (Krebs) Cycle**
 
-Built with **Mermaid.js**, this project features clickable and collapsible nodes, study modes, and responsive diagrams for efficient learning.
+Built with **Mermaid.js**, this project features clickable nodes, study modes, and responsive diagrams for efficient learning.
 
 ---
 
